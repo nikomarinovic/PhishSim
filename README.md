@@ -12,13 +12,13 @@
 - [Templates](#templates)
 - [Installation](#installation)
 - [Usage](#usage)
+- [How PhishSim Works](#how-phishsim-works)
 - [Adding Custom Templates](#adding-custom-templates)
 - [Project Structure](#project-structure)
 - [Security Notice](#security-notice)
 - [License](#license)
 - [Contributing](#contributing)
 - [Acknowledgements](#acknowledgements)
-- [Disclaimer](#disclaimer)
 
 ---
 
@@ -122,6 +122,60 @@ dotnet run --project PhishSim/PhishSim.csproj
 
 ---
 
+## How PhishSim Works
+
+> The following screenshots illustrate the complete workflow of **PhishSim**, from launching the application to demonstrating how credentials are captured in a **controlled, educational environment**.
+
+---
+
+#### 1. Program Startup
+- PhishSim is launched from the terminal, displaying the main interface and available commands.
+
+<img src="PhishSim/screenshots/screenshot1.png" alt="Program Startup" width="600">
+
+---
+
+#### 2. Launch Command & Server Selection
+- The `launch` command is executed, and the server type is selected (currently **Localhost**).
+
+<img src="PhishSim/screenshots/screenshot2.png" alt="Launch Command & Server Selection" width="600">
+
+---
+
+#### 3. Template Selection
+- After selecting the server type, a phishing‑simulation template is chosen (example shown: **Netflix**, option 3).
+
+<img src="PhishSim/screenshots/screenshot3.png" alt="Template Selection" width="600">
+
+---
+
+#### 4. Template Opened in Browser
+- The selected template automatically opens in the default web browser, displaying the simulated login page.
+
+<img src="PhishSim/screenshots/screenshot4.png" alt="Template Opened in Browser" width="600">
+
+---
+
+#### 5. Localhost Server Running
+- The terminal confirms that the website is running on `localhost` and is waiting for user interaction.
+
+<img src="PhishSim/screenshots/screenshot5.png" alt="Localhost Server Running" width="600">
+
+---
+
+#### 6. Entering Credentials
+- Sample credentials are entered into the login form, and the **Sign In** button is pressed.
+
+<img src="PhishSim/screenshots/screenshot6.png" alt="Entering Credentials" width="400">
+
+---
+
+#### 7. Captured Credentials Displayed
+- The terminal displays the captured username and password, demonstrating how phishing attacks operate in real scenarios — **strictly for educational and security awareness purposes**.
+
+<img src="PhishSim/screenshots/screenshot7.png" alt="Captured Credentials" width="600">
+
+---
 ## Adding Custom Templates
 
 To add a custom phishing‑simulation template, follow the steps below:
@@ -187,7 +241,6 @@ PhishSim/
 │   ├── RequestFilter.cs
 │   └── ServerConfig.cs
 ├── Templates/               # Fake website templates
-│   ├── DevPortal/
 │   ├── Google/
 │   ├── Instagram/
 │   ├── Netflix/
