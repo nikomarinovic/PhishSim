@@ -7,7 +7,6 @@
 ## Table of Contents
 
 - [Overview](#overview)
-- [Versions](#versions)
 - [Features](#features)
 - [Templates](#templates)
 - [Installation](#installation)
@@ -33,18 +32,6 @@ The tool is ideal for:
 - Security awareness workshops.  
 - Demonstrating attack vectors in ethical hacking scenarios.
 
----
-
-## Versions
-
-#### [v1.0.0] – 21.12.2025
-```Text
-Added:
-- Initial release of PhishSim.
-- Built-in templates: Google, Instagram, Netflix, Twitter.
-- Local server with terminal-based interface for educational phishing simulations.
-- Support for adding custom templates.
-```
 ---
 
 ## Features
