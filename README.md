@@ -7,7 +7,7 @@
 ## Table of Contents
 
 - [Overview](#overview)
-- [Versions](#versions)
+- [Example Walkthrough](#example-walkthrough)
 - [Features](#features)
 - [Templates](#templates)
 - [Installation](#installation)
@@ -18,7 +18,6 @@
 - [License](#license)
 - [Contributing](#contributing)
 - [Acknowledgements](#acknowledgements)
-- [Disclaimer](#disclaimer)
 
 ---
 
@@ -35,16 +34,58 @@ The tool is ideal for:
 
 ---
 
-## Versions
+## Example Walkthrough
 
-#### [v1.0.0] – 21.12.2025
-```Text
-Added:
-- Initial release of PhishSim.
-- Built-in templates: Google, Instagram, Netflix, Twitter.
-- Local server with terminal-based interface for educational phishing simulations.
-- Support for adding custom templates.
-```
+Below is a complete step-by-step demonstration of how PhishSim works in a controlled local environment.
+
+---
+
+1. Start the Application
+
+<p align="center">
+  <img src="PhishSim/screenshots/screenshot1.png" alt="Start Application" width="600"/>
+</p>
+
+---
+
+2. Choose Server Type
+
+<p align="center">
+  <img src="PhishSim/screenshots/screenshot2.png" alt="Start Application" width="600"/>
+</p>
+
+---
+
+3. Select a Template
+
+<p align="center">
+  <img src="PhishSim/screenshots/screenshot3.png" alt="Start Application" width="600"/>
+</p>
+
+---
+
+4. Template Opens in Browser
+
+<p align="center">
+  <img src="PhishSim/screenshots/screenshot4.png" alt="Start Application" width="600"/>
+</p>
+
+---
+
+5. Enter Demo Credentials
+
+<p align="center">
+  <img src="PhishSim/screenshots/screenshot6.png" alt="Start Application" width="600"/>
+</p>
+
+---
+
+6. Captured Credentials Displayed in Terminal
+
+<p align="center">
+  <img src="PhishSim/screenshots/screenshot5.png" alt="Start Application" width="600"/>
+</p>
+
 ---
 
 ## Features
