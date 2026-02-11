@@ -16,7 +16,7 @@ public static class ConsoleUI
         Console.ResetColor();
 
         Console.ForegroundColor = ConsoleColor.DarkBlue;
-        Console.WriteLine("** Phishing Tool - Modified By github.com/Nmarino8 **");
+        Console.WriteLine("** Phishing Tool - Modified By github.com/nikomarinovic **");
         Console.ResetColor();
         Console.WriteLine();
         
