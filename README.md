@@ -1,5 +1,5 @@
 <h1 align="center">
-  <img src="public/logo.svg" alt="PhishSim Logo" width="96" />
+  <img src="public/logo.png" alt="PhishSim Logo" width="96" />
   <br />
   PhishSim
 </h1>
