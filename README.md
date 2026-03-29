@@ -1,189 +1,164 @@
-# PhishSim
-
-**PhishSim** is an educational phishing-simulation tool inspired by BlackEye, designed to help users learn about phishing attacks, practice safe web habits, and understand how phishing techniques work in a controlled, safe environment. This tool is **strictly for educational purposes and security awareness training**.
-
----
-
-## Table of Contents
-
-- [Overview](#overview)
-- [Example Walkthrough](#example-walkthrough)
-- [Features](#features)
-- [Templates](#templates)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Adding Custom Templates](#adding-custom-templates)
-- [Project Structure](#project-structure)
-- [Security Notice](#security-notice)
-- [License](#license)
-- [Contributing](#contributing)
-- [Acknowledgements](#acknowledgements)
-
----
-
-## Overview
-
-PhishSim allows users to simulate phishing attacks in a safe, isolated environment.  
-It launches a local server that hosts multiple fake websites (templates) which mimic popular services like Google, Instagram, Netflix, and Twitter. Users can interact with these sites to see how credentials would be captured in real attacks—but in reality, no sensitive data is exposed outside the simulation.  
-
-The tool is ideal for:
-
-- Cybersecurity students learning about phishing.  
-- Security awareness workshops.  
-- Demonstrating attack vectors in ethical hacking scenarios.
-
----
-
-## Example Walkthrough
-
-Below is a complete step-by-step demonstration of how PhishSim works in a controlled local environment.
-
----
-
-1. Start the Application
+<h1 align="center">
+  <img src="public/logo.svg" alt="PhishSim Logo" width="96" />
+  <br />
+  PhishSim
+</h1>
 
 <p align="center">
-  <img src="PhishSim/screenshots/screenshot1.png" alt="Start Application" width="600"/>
+  An educational phishing-simulation tool — learn how phishing attacks work in a safe, controlled, local environment.
 </p>
 
 ---
 
-2. Choose Server Type
+## What is PhishSim?
+
+**PhishSim helps cybersecurity students and trainers understand phishing attacks hands-on:**
+
+- Hosts realistic fake login pages that mimic Google, Instagram, Netflix, Twitter, and more
+- Captures and displays submitted credentials in the terminal — locally, never transmitted
+- Extensible template system — add new simulation pages without touching the server core
+- Cross-platform support on Windows, macOS, and Linux
+- Simple terminal-based interface for full server control
+
+**`No real credentials leave your machine. Everything runs locally.`**
+
+> [!WARNING]
+> PhishSim is strictly for **educational purposes and security awareness training**.
+> Never deploy phishing templates on public networks or use this tool maliciously.
+> The author is not responsible for misuse.
+
+---
+
+## How It Works
+
+A complete walkthrough of PhishSim running in a controlled local environment:
+
+**1. Start the Application**
 
 <p align="center">
-  <img src="PhishSim/screenshots/screenshot2.png" alt="Start Application" width="600"/>
+  <img src="PhishSim/screenshots/screenshot1.png" alt="Start Application" width="700" />
 </p>
 
----
-
-3. Select a Template
+**2. Choose Server Type**
 
 <p align="center">
-  <img src="PhishSim/screenshots/screenshot3.png" alt="Start Application" width="600"/>
+  <img src="PhishSim/screenshots/screenshot2.png" alt="Choose Server Type" width="700" />
 </p>
 
----
-
-4. Template Opens in Browser
+**3. Select a Template**
 
 <p align="center">
-  <img src="PhishSim/screenshots/screenshot4.png" alt="Start Application" width="600"/>
+  <img src="PhishSim/screenshots/screenshot3.png" alt="Select a Template" width="700" />
 </p>
 
----
-
-5. Enter Demo Credentials
+**4. Template Opens in Browser**
 
 <p align="center">
-  <img src="PhishSim/screenshots/screenshot6.png" alt="Start Application" width="600"/>
+  <img src="PhishSim/screenshots/screenshot4.png" alt="Template in Browser" width="700" />
 </p>
 
----
-
-6. Captured Credentials Displayed in Terminal
+**5. Enter Demo Credentials**
 
 <p align="center">
-  <img src="PhishSim/screenshots/screenshot5.png" alt="Start Application" width="600"/>
+  <img src="PhishSim/screenshots/screenshot6.png" alt="Enter Demo Credentials" width="700" />
 </p>
 
----
+**6. Captured Credentials Displayed in Terminal**
 
-## Features
-
-- Hosts fake login pages for multiple templates.  
-- Captures username input and password.  
-- Displays captured input in the terminal for educational purposes.  
-- Extensible architecture — add new templates without changing the server core.  
-- Cross-platform support (Windows, macOS, Linux).  
-- Simple, terminal-based interface for server control.  
-
----
-
-## Templates
-
-PhishSim includes several built-in templates by default, such as:
-
-- **Google** — Mimics Google's login page  
-- **Instagram** — Mimics Instagram's login page  
-- **Netflix** — Mimics Netflix's login page  
-- **Twitter** — Mimics Twitter's login page  
-
-This list is **not exhaustive**. 
-Additional templates will be added in future updates, 
-and users can freely create and add their own custom templates.
-
-> Templates can be added or removed by placing them in the `Templates` folder.
+<p align="center">
+  <img src="PhishSim/screenshots/screenshot5.png" alt="Captured Credentials in Terminal" width="700" />
+</p>
 
 ---
 
 ## Installation
 
-1. Clone the repository and navigate into the project directory:
-```text
+### Requirements
+
+- .NET SDK installed ([verify with `dotnet --version`](https://dotnet.microsoft.com/en-us/download))
+- Windows, macOS, or Linux
+
+### Steps
+
+Clone the repository and navigate into the project:
+```bash
 git clone https://github.com/Nmarino8/PhishSim.git
-
-```
-```text
 cd PhishSim/PhishSim
-
 ```
 
-2. Ensure you have the .NET SDK installed:
-```text
-dotnet --version
-
-```
-
-3. Build the project:
-```text
+Build the project:
+```bash
 dotnet build
-
 ```
+
 ---
 
 ## Usage
 
-**1.**	Run the project:
-```text
+Run the project:
+```bash
 dotnet run
-
 ```
 
-Or, if you are in a parent folder:
-
-```text
+Or from a parent folder:
+```bash
 dotnet run --project PhishSim/PhishSim.csproj
-
 ```
-2. Select the server type (for now only Localhost).
-3. Select a template from the available list.
-4. The local server will start and open your default browser with the chosen template.
-5. Interact with the page (enter username and password).
-6. Terminal output will show captured username and password.
+
+Then follow the prompts:
+
+1. Select the server type — currently **Localhost** only
+2. Select a template from the list
+3. The local server starts and opens your default browser with the chosen template
+4. Interact with the page — enter any username and password
+5. Watch the terminal — captured input is displayed immediately
+
+---
+
+## Features
+
+- **Fake Login Pages** — hosts realistic simulation pages for multiple services
+- **Credential Capture** — username and password inputs are intercepted and shown in the terminal
+- **Extensible Templates** — add new templates by dropping a folder into `Templates/` — no core changes needed
+- **Cross-platform** — runs on Windows, macOS, and Linux via .NET
+- **Terminal Interface** — clean CLI for server control, template selection, and output
+
+---
+
+## Built-in Templates
+
+| Template | Mimics |
+|---|---|
+| **Google** | Google login page |
+| **Instagram** | Instagram login page |
+| **Netflix** | Netflix login page |
+| **Twitter** | Twitter login page |
+| **DevPortal** | Generic developer portal |
+
+> [!NOTE]
+> This list is not exhaustive. Additional templates will be added in future updates. You can also create and add your own — see below.
 
 ---
 
 ## Adding Custom Templates
 
-To add a custom phishing‑simulation template, follow the steps below:
+1. Create a new folder inside `Templates/` — the folder name becomes the template name in PhishSim.
 
-1. Create a new folder inside the `Templates/` directory.  
-   The folder name will be used as the template name in PhishSim.
+2. Add the following files inside your new folder:
 
-2. Inside the newly created folder, add the following files:
+   | File | Required | Purpose |
+   |---|---|---|
+   | `index.html` | ✅ | Main HTML page for the template |
+   | `script.js` | ✅ | Handles form submission and credential capture |
+   | `styles.css` | Optional | CSS styling for the page |
+   | `images/` | Optional | Images and asset files |
 
-   - `index.html` — The main HTML page for your template  
-   - `styles.css` — Optional CSS styling for the page  
-   - `script.js` — **Required JavaScript file** (see below)  
-   - `images/` — Optional folder for images and assets  
+3. Your `index.html` **must** include a form with these exact IDs:
+   - `id="loginForm"` on the `<form>` element
+   - `id="username"` on the username input
+   - `id="password"` on the password input
 
-3. Your `index.html` **must** include a form with:
-   - An element with `id="loginForm"`
-   - A username input with `id="username"`
-   - A password input with `id="password"`
-
-4. Add the following **exact code** to your `script.js` file:
-
+4. Add this **exact code** to your `script.js`:
 ```javascript
 const form = document.getElementById('loginForm');
 
@@ -206,84 +181,61 @@ form.addEventListener('submit', (e) => {
 });
 ```
 
-5. Restart PhishSim.  
-   The new template will automatically appear in the template selection menu.
+5. Restart PhishSim — the new template appears automatically in the selection menu.
 
-> The server automatically detects and serves new templates without any changes to the core code.
+> [!TIP]
+> The server auto-detects new templates on startup. No changes to the core code are ever needed.
 
 ---
 
 ## Project Structure
-
 ```bash
 PhishSim/
-├── CLI/                     # Command-line interface files
+├── CLI/                        # Command-line interface
 │   ├── CommandRouter.cs
 │   ├── ConsoleUI.cs
 │   └── Commands/
 │       ├── LaunchCommand.cs
 │       └── ListCommand.cs
-├── Server/                  # Local server logic and template serving
+├── Server/                     # Local server logic and template serving
 │   ├── LocalServer.cs
 │   ├── RequestFilter.cs
 │   └── ServerConfig.cs
-├── Templates/               # Fake website templates
+├── Templates/                  # Simulation website templates
 │   ├── DevPortal/
 │   ├── Google/
 │   ├── Instagram/
 │   ├── Netflix/
 │   └── Twitter/
-├── Utils/                   # Helper utilities (animations, colors, etc.)
+├── Utils/                      # Helper utilities
 │   └── TerminalAnimation.cs
-├── PhishSim.csproj          # .NET project file
-└── Program.cs               # Main entry point
+├── PhishSim.csproj             # .NET project file
+└── Program.cs                  # Main entry point
 ```
----
-
-## Security Notice
-
-**Warning:** PhishSim is a simulation tool intended for **educational purposes only**.  
-
-- No real credentials are captured or transmitted outside your local environment.  
-- Always use PhishSim responsibly — **never deploy phishing templates on public networks** or use them maliciously.  
-- This tool is strictly for **learning, training, and security awareness**.
 
 ---
 
-## License
+## Data & Privacy
 
-PhishSim is licensed under the **Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)** license.
+PhishSim captures no real credentials. All input submitted through simulation pages is intercepted locally and displayed only in your terminal. Nothing is stored, logged to disk, or transmitted outside your machine.
 
-You are free to **share** (copy and redistribute) and **adapt** (modify) this project for any **non-commercial purpose**,  
-as long as you give proper attribution to the original author: **Niko Marinović** ([https://github.com/Nmarino8](https://github.com/Nmarino8)).
+> [!NOTE]
+> PhishSim is inspired by **BlackEye** as a foundation for educational phishing simulations.
+> Thanks to the cybersecurity community for guidance, insights, and best practices.
 
-You may **not use this project for commercial purposes**.
-
----
-
-## Contributing
-
-Contributions are welcome! You can contribute by:
-
-- Adding new templates for educational purposes
-- Improving the server or CLI features
-- Fixing bugs or optimizing performance
-
-### How to contribute
-
-1. **Fork** the repository.
-2. **Make changes** in your fork.
-3. **Push** the changes to your fork.
-4. **Open a Pull Request** to merge your changes into this repository.
-5. Use **Issues** to discuss bugs, suggest features, or ask questions.
+> [!WARNING]
+> This tool is intended for **learning, training, and security awareness only**.
+> Always use PhishSim responsibly. The author is not responsible for any misuse.
 
 ---
 
-## Acknowledgements
-
-- Inspired by **BlackEye** as a foundation for educational phishing simulations.  
-- Thanks to the **cybersecurity community** for their guidance, insights, and best practices.  
+<h3 align="center">
+  PhishSim welcomes contributions — new templates, server improvements, bug fixes, and CLI enhancements.<br />
+  Fork the repo, make your changes, and open a Pull Request. Use Issues for bugs, features, and questions.
+</h3>
 
 ---
 
-**Disclaimer: This project is intended for educational use only. The author is not responsible for misuse. Always use ethically.**
+<p align="center">
+  © 2026 Niko Marinović. All rights reserved.
+</p>
