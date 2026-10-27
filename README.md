@@ -14,13 +14,13 @@
 
 **PhishSim helps cybersecurity students and trainers understand phishing attacks hands-on:**
 
-- Hosts realistic fake login pages that mimic Google, Instagram, Netflix, Twitter, and more
-- Captures and displays submitted credentials in the terminal — locally, never transmitted
+- Hosts local awareness-training pages inspired by common sign-in patterns
+- Reports only that a demo form was submitted; entered values are never sent to or displayed by the server
 - Extensible template system — add new simulation pages without touching the server core
 - Cross-platform support on Windows, macOS, and Linux
 - Simple terminal-based interface for full server control
 
-**`No real credentials leave your machine. Everything runs locally.`**
+**`PhishSim does not collect, store, or transmit submitted form values.`**
 
 > [!WARNING]
 > PhishSim is strictly for **educational purposes and security awareness training**.
@@ -57,17 +57,7 @@ A complete walkthrough of PhishSim running in a controlled local environment:
   <img src="PhishSim/screenshots/screenshot4.png" alt="Template in Browser" width="700" />
 </p>
 
-**5. Enter Demo Credentials**
-
-<p align="center">
-  <img src="PhishSim/screenshots/screenshot6.png" alt="Enter Demo Credentials" width="700" />
-</p>
-
-**6. Captured Credentials Displayed in Terminal**
-
-<p align="center">
-  <img src="PhishSim/screenshots/screenshot5.png" alt="Captured Credentials in Terminal" width="700" />
-</p>
+After submitting the form, PhishSim reports only the training event. The entered values are discarded by the page and are not sent to the server.
 
 ---
 
@@ -76,6 +66,7 @@ A complete walkthrough of PhishSim running in a controlled local environment:
 ### Requirements
 
 - .NET SDK installed ([verify with `dotnet --version`](https://dotnet.microsoft.com/en-us/download))
+- .NET 10 SDK or newer
 - Windows, macOS, or Linux
 
 ### Steps
@@ -107,18 +98,22 @@ dotnet run --project PhishSim/PhishSim.csproj
 
 Then follow the prompts:
 
-1. Select the server type — currently **Localhost** only
-2. Select a template from the list
-3. The local server starts and opens your default browser with the chosen template
-4. Interact with the page — enter any username and password
-5. Watch the terminal — captured input is displayed immediately
+1. Use `launch` to start the interactive template picker
+2. Or launch a template directly with `launch Google`
+3. Use `list` to view all templates available in the current build
+4. Select the server type — currently **Localhost** only
+5. The local server starts and opens your default browser with the chosen template
+6. Interact with the page — enter any username and password
+7. Watch the terminal — a submission event is displayed, without any form values
 
 ---
 
 ## Features
 
-- **Fake Login Pages** — hosts realistic simulation pages for multiple services
-- **Credential Capture** — username and password inputs are intercepted and shown in the terminal
+- **Awareness Simulations** — serves local training pages inspired by common sign-in patterns
+- **Privacy by design** — submitted values are not read by the scripts or accepted by the server; only a fixed submission event is reported
+- **Local-only server** — binds to `127.0.0.1`, restricts file requests to the selected template, and rejects unsupported HTTP methods
+- **Request limits** — caps the training-event request body and validates the expected event
 - **Extensible Templates** — add new templates by dropping a folder into `Templates/` — no core changes needed
 - **Cross-platform** — runs on Windows, macOS, and Linux via .NET
 - **Terminal Interface** — clean CLI for server control, template selection, and output
@@ -133,10 +128,8 @@ Then follow the prompts:
 | **Instagram** | Instagram login page |
 | **Netflix** | Netflix login page |
 | **Twitter** | Twitter login page |
-| **DevPortal** | Generic developer portal |
 
-> [!NOTE]
-> This list is not exhaustive. Additional templates will be added in future updates. You can also create and add your own — see below.
+You can add your own training templates — see below.
 
 ---
 
@@ -149,7 +142,7 @@ Then follow the prompts:
    | File | Required | Purpose |
    |---|---|---|
    | `index.html` | ✅ | Main HTML page for the template |
-   | `script.js` | ✅ | Handles form submission and credential capture |
+   | `script.js` | ✅ | Reports a submission event without reading or sending form values |
    | `styles.css` | Optional | CSS styling for the page |
    | `images/` | Optional | Images and asset files |
 
@@ -158,28 +151,28 @@ Then follow the prompts:
    - `id="username"` on the username input
    - `id="password"` on the password input
 
-4. Add this **exact code** to your `script.js`:
+4. Add this safe, event-only handler to your `script.js`:
 ```javascript
 const form = document.getElementById('loginForm');
 
 form.addEventListener('submit', (e) => {
     e.preventDefault();
 
-    const username = document.getElementById('username').value;
-    const password = document.getElementById('password').value;
-
     fetch('/demo', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            username: username,
-            password: password
-        })
-    });
-
-    form.reset();
+        body: JSON.stringify({ event: 'form-submitted' })
+    }).then((response) => {
+        if (!response.ok) {
+            throw new Error('Simulation endpoint returned an error');
+        }
+    }).catch(() => {
+        window.alert('The local simulation could not be reached. No information was collected.');
+    }).finally(() => form.reset());
 });
 ```
+
+Do not read, submit, log, or store the form fields. The built-in templates follow this rule; the server accepts only the fixed training event and does not display submitted values.
 
 5. Restart PhishSim — the new template appears automatically in the selection menu.
 
@@ -198,12 +191,14 @@ PhishSim/
 │       ├── LaunchCommand.cs
 │       └── ListCommand.cs
 ├── Server/                     # Local server logic and template serving
-│   ├── LocalServer.cs
+│   ├── LocalServers.cs
 │   ├── RequestFilter.cs
 │   └── ServerConfig.cs
 ├── Templates/                  # Simulation website templates
-│   ├── DevPortal/
 │   ├── Google/
+│   ├── Instagram/
+│   ├── Netflix/
+│   └── Twitter/
 │   ├── Instagram/
 │   ├── Netflix/
 │   └── Twitter/
@@ -217,7 +212,7 @@ PhishSim/
 
 ## Data & Privacy
 
-PhishSim captures no real credentials. All input submitted through simulation pages is intercepted locally and displayed only in your terminal. Nothing is stored, logged to disk, or transmitted outside your machine.
+PhishSim binds its HTTP server to the loopback interface (`127.0.0.1`). The built-in templates never read or transmit the values entered into their fields; they send only a fixed `form-submitted` event. The server validates that event, reports it in the terminal, and does not log or persist form values. Use fictional data for demonstrations, and review custom templates before running them.
 
 > [!NOTE]
 > PhishSim is inspired by **BlackEye** as a foundation for educational phishing simulations.

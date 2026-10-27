@@ -3,17 +3,17 @@ const form = document.getElementById('loginForm');
 form.addEventListener('submit', (e) => {
     e.preventDefault();
 
-    const username = document.getElementById('username').value;
-    const password = document.getElementById('password').value;
-
     fetch('/demo', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            username: username,
-            password: password
-        })
-    });
+        body: JSON.stringify({ event: 'form-submitted' })
+    }).then((response) => {
+        if (!response.ok) {
+            throw new Error('Simulation endpoint returned an error');
+        }
 
-    form.reset();
+        window.alert('Training simulation complete. No information was collected.');
+    }).catch(() => {
+        window.alert('The local simulation could not be reached. No information was collected.');
+    }).finally(() => form.reset());
 });

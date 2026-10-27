@@ -1,13 +1,16 @@
-﻿using System.Net;
 using System.Diagnostics;
+using System.Net;
 using System.Text.Json;
+using System.ComponentModel;
 using PhishSim.CLI.Commands;
 
 namespace PhishSim.Server;
 
 public class LocalServer
 {
+    private const int MaxRequestBodyBytes = 1024;
     private readonly string _templatePath;
+    private readonly string _templateRoot;
     private readonly string _templateName;
     private HttpListener? _listener;
     private bool _running = true;
@@ -20,6 +23,7 @@ public class LocalServer
             "Templates",
             templateName
         );
+        _templateRoot = Path.GetFullPath(_templatePath) + Path.DirectorySeparatorChar;
     }
 
     public void Start()
@@ -33,69 +37,155 @@ public class LocalServer
         _listener = new HttpListener();
         var prefix = $"http://127.0.0.1:{ServerConfig.Port}/";
         _listener.Prefixes.Add(prefix);
-        _listener.Start();
 
-        OpenBrowser(prefix);
-
-        LaunchCommand.PrintServerLine($"Serving {_templateName} (localhost)");
-        LaunchCommand.PrintServerLink("Open", prefix);
-        LaunchCommand.PrintServerLine("Press CTRL+C to stop server");
-        Console.WriteLine();
-        Console.WriteLine("Waiting for victim to enter credentials...");
-        Console.WriteLine();
+        try
+        {
+            _listener.Start();
+        }
+        catch (HttpListenerException ex)
+        {
+            Console.Error.WriteLine($"Unable to start the local server on port {ServerConfig.Port}: {ex.Message}");
+            _listener.Close();
+            return;
+        }
 
         Console.CancelKeyPress += OnCancelKeyPress;
 
-        while (_running)
+        try
         {
-            try
-            {
-                var context = _listener.GetContext();
+            OpenBrowser(prefix);
 
-                if (context.Request.HttpMethod == "POST" &&
-                    context.Request.Url!.AbsolutePath == "/demo")
+            LaunchCommand.PrintServerLine($"Serving {_templateName} on localhost");
+            LaunchCommand.PrintServerLink("Open", prefix);
+            LaunchCommand.PrintServerLine("Only form-submission events are reported; entered values are never sent.");
+            LaunchCommand.PrintServerLine("Press CTRL+C to stop server");
+            Console.WriteLine();
+
+            while (_running)
+            {
+                try
                 {
-                    HandleDemo(context);
-                    continue;
+                    var context = _listener.GetContext();
+                    try
+                    {
+                        HandleRequest(context);
+                    }
+                    catch (ObjectDisposedException)
+                    {
+                        Console.Error.WriteLine("The client closed a request before it could be handled.");
+                    }
+                    catch (HttpListenerException ex)
+                    {
+                        Console.Error.WriteLine($"Unable to complete an HTTP request: {ex.Message}");
+                    }
+                    catch (IOException ex)
+                    {
+                        Console.Error.WriteLine($"Unable to complete an HTTP request: {ex.Message}");
+                    }
                 }
-
-                ServeFile(context);
-            }
-            catch (HttpListenerException)
-            {
-                break;
+                catch (HttpListenerException) when (!_running)
+                {
+                    break;
+                }
+                catch (HttpListenerException ex)
+                {
+                    Console.Error.WriteLine($"The local server stopped unexpectedly: {ex.Message}");
+                    break;
+                }
             }
         }
+        finally
+        {
+            Cleanup();
+        }
+    }
 
-        Cleanup();
+    private void HandleRequest(HttpListenerContext context)
+    {
+        context.Response.Headers["X-Content-Type-Options"] = "nosniff";
+        context.Response.Headers["Cache-Control"] = "no-store";
+
+        if (context.Request.HttpMethod == "POST" &&
+            context.Request.Url?.AbsolutePath == "/demo")
+        {
+            HandleDemo(context);
+            return;
+        }
+
+        if (RequestFilter.IsAllowed(context.Request))
+        {
+            ServeFile(context);
+            return;
+        }
+
+        context.Response.StatusCode = (int)HttpStatusCode.MethodNotAllowed;
+        context.Response.Close();
     }
 
     private void HandleDemo(HttpListenerContext context)
     {
-        using var reader = new StreamReader(context.Request.InputStream);
-        var body = reader.ReadToEnd();
+        if (context.Request.ContentType?.StartsWith(
+                "application/json",
+                StringComparison.OrdinalIgnoreCase) != true)
+        {
+            context.Response.StatusCode = (int)HttpStatusCode.UnsupportedMediaType;
+            context.Response.Close();
+            return;
+        }
+
+        if (context.Request.ContentLength64 > MaxRequestBodyBytes)
+        {
+            context.Response.StatusCode = (int)HttpStatusCode.RequestEntityTooLarge;
+            context.Response.Close();
+            return;
+        }
+
+        using var body = new MemoryStream();
+        var buffer = new byte[256];
+        int bytesRead;
+        while ((bytesRead = context.Request.InputStream.Read(buffer, 0, buffer.Length)) > 0)
+        {
+            if (body.Length + bytesRead > MaxRequestBodyBytes)
+            {
+                context.Response.StatusCode = (int)HttpStatusCode.RequestEntityTooLarge;
+                context.Response.Close();
+                return;
+            }
+
+            body.Write(buffer, 0, bytesRead);
+        }
 
         try
         {
-            var json = JsonDocument.Parse(body).RootElement;
-
-            var username = json.GetProperty("username").GetString() ?? "(empty)";
-            var password = json.GetProperty("password").GetString() ?? "(empty)";
-
-            Console.WriteLine();
-            Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine("[*] Victim login received");
-            Console.ResetColor();
-
-            Console.WriteLine($"    Username: {username}");
-            Console.WriteLine($"    Password: {password}");
+            using var json = JsonDocument.Parse(body.ToArray());
+            if (json.RootElement.ValueKind != JsonValueKind.Object ||
+                json.RootElement.EnumerateObject().Count() != 1 ||
+                !json.RootElement.TryGetProperty("event", out var eventName) ||
+                eventName.ValueKind != JsonValueKind.String ||
+                eventName.GetString() != "form-submitted")
+            {
+                context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                context.Response.Close();
+                return;
+            }
         }
-        catch
+        catch (JsonException)
         {
-            Console.WriteLine("[!] Invalid demo payload");
+            context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+            context.Response.Close();
+            return;
         }
 
-        context.Response.StatusCode = 200;
+        Console.WriteLine();
+        Console.ForegroundColor = ConsoleColor.Cyan;
+        Console.WriteLine("[*] SIMULATION EVENT RECEIVED");
+        Console.ResetColor();
+        Console.WriteLine($"    Template: {_templateName}");
+        Console.WriteLine("    Event: Login form submitted");
+        Console.WriteLine($"    Time: {DateTimeOffset.Now:yyyy-MM-dd HH:mm:ss zzz}");
+        Console.WriteLine("    Entered values: not transmitted");
+
+        context.Response.StatusCode = (int)HttpStatusCode.NoContent;
         context.Response.Close();
     }
 
@@ -109,7 +199,14 @@ public class LocalServer
                 UseShellExecute = true
             });
         }
-        catch { }
+        catch (Win32Exception ex)
+        {
+            Console.Error.WriteLine($"Could not open a browser automatically: {ex.Message}");
+        }
+        catch (InvalidOperationException ex)
+        {
+            Console.Error.WriteLine($"Could not open a browser automatically: {ex.Message}");
+        }
     }
 
     private void OnCancelKeyPress(object? sender, ConsoleCancelEventArgs e)
@@ -135,35 +232,89 @@ public class LocalServer
 
     private void ServeFile(HttpListenerContext context)
     {
-        var relativePath = context.Request.Url!.AbsolutePath.Trim('/');
-
-        if (string.IsNullOrEmpty(relativePath))
-            relativePath = "index.html";
-
-        var filePath = Path.Combine(_templatePath, relativePath);
-
-        if (!File.Exists(filePath))
+        if (!TryResolveFilePath(context.Request.Url?.AbsolutePath ?? "/", out var filePath))
         {
-            context.Response.StatusCode = 404;
+            context.Response.StatusCode = (int)HttpStatusCode.NotFound;
             context.Response.Close();
             return;
         }
 
-        var bytes = File.ReadAllBytes(filePath);
-        context.Response.ContentType = GetContentType(filePath);
-        context.Response.OutputStream.Write(bytes, 0, bytes.Length);
-        context.Response.Close();
+        try
+        {
+            if (!File.Exists(filePath))
+            {
+                context.Response.StatusCode = (int)HttpStatusCode.NotFound;
+                context.Response.Close();
+                return;
+            }
+
+            var bytes = File.ReadAllBytes(filePath);
+            context.Response.ContentType = GetContentType(filePath);
+            context.Response.ContentLength64 = bytes.Length;
+            context.Response.OutputStream.Write(bytes, 0, bytes.Length);
+            context.Response.Close();
+        }
+        catch (IOException ex)
+        {
+            Console.Error.WriteLine($"Unable to serve requested template file: {ex.Message}");
+            context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+            context.Response.Close();
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            Console.Error.WriteLine($"Unable to access requested template file: {ex.Message}");
+            context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+            context.Response.Close();
+        }
+    }
+
+    private bool TryResolveFilePath(string requestPath, out string filePath)
+    {
+        filePath = string.Empty;
+
+        try
+        {
+            var relativePath = Uri.UnescapeDataString(requestPath).Trim('/');
+            if (string.IsNullOrEmpty(relativePath))
+                relativePath = "index.html";
+
+            var candidate = Path.GetFullPath(Path.Combine(_templatePath, relativePath));
+            var pathComparison = OperatingSystem.IsWindows()
+                ? StringComparison.OrdinalIgnoreCase
+                : StringComparison.Ordinal;
+            if (!candidate.StartsWith(_templateRoot, pathComparison))
+                return false;
+
+            filePath = candidate;
+            return true;
+        }
+        catch (UriFormatException)
+        {
+            return false;
+        }
+        catch (ArgumentException)
+        {
+            return false;
+        }
+        catch (NotSupportedException)
+        {
+            return false;
+        }
+        catch (PathTooLongException)
+        {
+            return false;
+        }
     }
 
     private static string GetContentType(string path) =>
         Path.GetExtension(path) switch
         {
-            ".html" => "text/html",
-            ".css" => "text/css",
-            ".js" => "application/javascript",
+            ".html" => "text/html; charset=utf-8",
+            ".css" => "text/css; charset=utf-8",
+            ".js" => "application/javascript; charset=utf-8",
             ".png" => "image/png",
-            ".jpg" => "image/jpeg",
-            ".svg" => "image/svg+xml",
+            ".jpg" or ".jpeg" => "image/jpeg",
+            ".svg" => "image/svg+xml; charset=utf-8",
             _ => "application/octet-stream"
         };
 }

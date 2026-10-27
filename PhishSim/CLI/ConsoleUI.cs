@@ -16,7 +16,7 @@ public static class ConsoleUI
         Console.ResetColor();
 
         Console.ForegroundColor = ConsoleColor.DarkBlue;
-        Console.WriteLine("** Phishing Tool - Modified By github.com/nikomarinovic **");
+        Console.WriteLine("** Local Security Awareness Simulation **");
         Console.ResetColor();
         Console.WriteLine();
         
@@ -40,9 +40,16 @@ public static class ConsoleUI
         Console.WriteLine(@"
 Usage:
 
-  launch        Start interactive simulation
-  help, -h      Show help menu
-  quit, -q      Exit PhishSim
+  launch [template]   Start interactive simulation or launch a template directly
+  list, ls            Show all available phishing templates
+  help, -h            Show help menu
+  quit, -q            Exit PhishSim
+
+Examples:
+
+  launch
+  launch Google
+  list
 ");
     }
 }

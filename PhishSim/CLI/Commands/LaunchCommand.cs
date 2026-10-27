@@ -5,10 +5,16 @@ namespace PhishSim.CLI.Commands;
 
 public class LaunchCommand
 {
-    public void Execute()
+    public void Execute(string? explicitTemplate = null)
     {
         if (!SelectLocalhost())
             return;
+
+        if (!string.IsNullOrWhiteSpace(explicitTemplate))
+        {
+            LaunchTemplate(explicitTemplate);
+            return;
+        }
 
         SelectTemplate();
     }
@@ -49,20 +55,7 @@ public class LaunchCommand
 
     private void SelectTemplate()
     {
-        var templatesPath = Path.Combine(AppContext.BaseDirectory, "Templates");
-
-        if (!Directory.Exists(templatesPath))
-        {
-            PrintError("Templates directory not found.");
-            return;
-        }
-
-        var templates = Directory
-            .GetDirectories(templatesPath)
-            .Where(dir => File.Exists(Path.Combine(dir, "index.html")))
-            .Select(Path.GetFileName)
-            .Where(name => !string.IsNullOrWhiteSpace(name))
-            .ToList();
+        var templates = ListCommand.GetAvailableTemplates();
 
         if (templates.Count == 0)
         {
@@ -73,7 +66,7 @@ public class LaunchCommand
         PrintSection("Available templates");
 
         for (int i = 0; i < templates.Count; i++)
-            PrintOption(i + 1, templates[i]!);
+            PrintOption(i + 1, templates[i]);
 
         Console.WriteLine();
         PrintPrompt("Select a template: ");
@@ -88,14 +81,32 @@ public class LaunchCommand
             return;
         }
 
-        var chosenTemplate = templates[index - 1]!;
+        LaunchTemplate(templates[index - 1]);
+    }
+
+    private void LaunchTemplate(string templateName)
+    {
+        var templates = ListCommand.GetAvailableTemplates();
+        var matchedTemplate = templates.FirstOrDefault(name =>
+            string.Equals(name, templateName, StringComparison.OrdinalIgnoreCase));
+
+        if (matchedTemplate is null)
+        {
+            Console.WriteLine();
+            PrintError($"Template '{templateName}' not found.");
+            Console.WriteLine();
+            Console.WriteLine("Use the list command to view the available templates.");
+            Console.WriteLine();
+            return;
+        }
+
         Console.WriteLine();
-        PrintStatus($"Launching {chosenTemplate} on localhost");
+        PrintStatus($"Launching {matchedTemplate} on localhost");
         Console.WriteLine();
         TerminalAnimation.Spinner("Starting local server");
         TerminalAnimation.Spinner("Deploying static content");
 
-        var server = new LocalServer(chosenTemplate);
+        var server = new LocalServer(matchedTemplate);
         server.Start();
     }
 
